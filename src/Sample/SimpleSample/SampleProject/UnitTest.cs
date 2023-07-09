@@ -8,7 +8,7 @@ namespace SampleProject;
 public class UnitTest1
 {
     [TestMethod]
-    public void TestMethod1()
+    public void SampleTest()
     {
         //Arrange
         var sut = new ControllerToTest(null);
@@ -22,6 +22,26 @@ public class UnitTest1
 
         //Assert
         Assert.AreEqual(25, result);
+    }
+
+    [TestMethod]
+    public void MultipleMock()
+    {
+        //Arrange
+        var sut = new ControllerToTest(null);
+
+        [InterceptestMock(typeof(ServiceToMock), nameof(ServiceToMock.FunctionToMockMultiple2), typeof(ControllerToTest), nameof(ControllerToTest.FunctionToTest2))]
+        int Mock2(int parameter) { return parameter; }
+
+        [InterceptestMock(typeof(ServiceToMock), nameof(ServiceToMock.FunctionToMockMultiple3), typeof(ControllerToTest), nameof(ControllerToTest.FunctionToTest2))]
+        int Mock3(int parameter) { return parameter +5; }
+
+
+        //Act
+        var result = sut.FunctionToTest2("5");
+
+        //Assert
+        Assert.AreEqual(50, result);
     }
 }
 

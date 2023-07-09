@@ -6,5 +6,14 @@
         {
             throw new NotImplementedException();
         }
+
+        public int FunctionToMockMultiple2(int parameter)
+        {
+            throw new NotImplementedException();
+        }
+        public int FunctionToMockMultiple3(int parameter)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

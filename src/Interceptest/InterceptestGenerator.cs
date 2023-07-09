@@ -38,13 +38,13 @@ public class InterceptestGenerator : ISourceGenerator
         syntaxFactory = syntaxFactory.AddUsings(SyntaxFactory.UsingDirective(SyntaxFactory.ParseName("System.Runtime.CompilerServices")));
         var @namespace = SyntaxFactory.NamespaceDeclaration(SyntaxFactory.ParseName(_generateNamespace).NormalizeWhitespace());
         var classDeclaration = SyntaxFactory.ClassDeclaration(_generateClass)
-            .AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword),SyntaxFactory.Token(SyntaxKind.StaticKeyword));
+            .AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword), SyntaxFactory.Token(SyntaxKind.StaticKeyword));
 
 
-        foreach(var candidateMethod in receiver.CandidateMethods)
+        foreach (var candidateMethod in receiver.CandidateMethods)
         {
             var attribute = candidateMethod.AttributeLists.Select(al => al.Attributes.First(a => ((IdentifierNameSyntax)a.Name).Identifier.ValueText == "InterceptestMockAttribute" || ((IdentifierNameSyntax)a.Name).Identifier.ValueText == "InterceptestMock")).First();
-            
+
             //todo clean up
             var typeToMockExpression = (IdentifierNameSyntax)((TypeOfExpressionSyntax)attribute.ArgumentList.Arguments[0].Expression).Type;
             var functionToMockExpression = (MemberAccessExpressionSyntax)((InvocationExpressionSyntax)attribute.ArgumentList.Arguments[1].Expression).ArgumentList.Arguments[0].Expression;
@@ -65,7 +65,7 @@ public class InterceptestGenerator : ISourceGenerator
             var syntaxReference = callingFunction.DeclaringSyntaxReferences.FirstOrDefault().GetSyntax() as MethodDeclarationSyntax;
 
             var location = receiver.MemberAccessExpressions[new MethodAccessExpressionKey(callingTypeExpression.Identifier.ValueText, ((IdentifierNameSyntax)callingFunctionExpression.Name).Identifier.ValueText, typeToMockExpression.Identifier.ValueText, ((IdentifierNameSyntax)functionToMockExpression.Name).Identifier.ValueText)].GetLineSpan();
-                     
+
 
             var testMethod = candidateMethod.Parent.Parent;
             var testClass = candidateMethod.Parent.Parent.Parent as ClassDeclarationSyntax;
@@ -77,10 +77,10 @@ public class InterceptestGenerator : ISourceGenerator
 
             parameters.AddRange(candidateMethod.ParameterList.Parameters);
 
-            
 
-            var methodDeclaration = SyntaxFactory.MethodDeclaration(SyntaxFactory.ParseTypeName("int"), "InterceptorMethod2")
-            .AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword), SyntaxFactory.Token(SyntaxKind.StaticKeyword)) 
+
+            var methodDeclaration = SyntaxFactory.MethodDeclaration(SyntaxFactory.ParseTypeName("int"),candidateMethod.Identifier.ValueText )
+            .AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword), SyntaxFactory.Token(SyntaxKind.StaticKeyword))
             .WithParameterList(SyntaxFactory.ParameterList(SyntaxFactory.SeparatedList(parameters)))
             .AddAttributeLists(SyntaxFactory.AttributeList(SyntaxFactory.SeparatedList(new List<AttributeSyntax>
             {
@@ -96,14 +96,13 @@ public class InterceptestGenerator : ISourceGenerator
             methodDeclaration = methodDeclaration.AddBodyStatements(candidateMethod.Body);
 
             classDeclaration = classDeclaration.AddMembers(methodDeclaration);
-            @namespace = @namespace.AddMembers(classDeclaration);
-            syntaxFactory = syntaxFactory.AddMembers(@namespace);
-            context.AddSource("Interceptest", syntaxFactory.NormalizeWhitespace().ToFullString());
-
         }
 
+        @namespace = @namespace.AddMembers(classDeclaration);
+        syntaxFactory = syntaxFactory.AddMembers(@namespace);
+        context.AddSource("Interceptest", syntaxFactory.NormalizeWhitespace().ToFullString());
 
-        
-    }
+    }      
+    
 }
 

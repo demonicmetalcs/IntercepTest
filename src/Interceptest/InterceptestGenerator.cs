@@ -45,6 +45,7 @@ public class InterceptestGenerator : ISourceGenerator
         {
             var attribute = candidateMethod.AttributeLists.Select(al => al.Attributes.First(a => ((IdentifierNameSyntax)a.Name).Identifier.ValueText == "InterceptestMockAttribute" || ((IdentifierNameSyntax)a.Name).Identifier.ValueText == "InterceptestMock")).First();
             
+            //todo clean up
             var typeToMockExpression = (IdentifierNameSyntax)((TypeOfExpressionSyntax)attribute.ArgumentList.Arguments[0].Expression).Type;
             var functionToMockExpression = (MemberAccessExpressionSyntax)((InvocationExpressionSyntax)attribute.ArgumentList.Arguments[1].Expression).ArgumentList.Arguments[0].Expression;
             var typeToMock = alltest.First(t => t.Name == typeToMockExpression.Identifier.ValueText);
@@ -63,6 +64,8 @@ public class InterceptestGenerator : ISourceGenerator
 
             var syntaxReference = callingFunction.DeclaringSyntaxReferences.FirstOrDefault().GetSyntax() as MethodDeclarationSyntax;
             FileLinePositionSpan location = new FileLinePositionSpan();
+
+            //todo syntax walker
             foreach(var statement in syntaxReference.Body.Statements)
             {
                 if(statement is ReturnStatementSyntax returnStatement)

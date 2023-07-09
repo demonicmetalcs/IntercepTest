@@ -13,8 +13,8 @@ public class UnitTest1
         //Arrange
         var sut = new ControllerToTest(null);
 
-        [InterceptestMock("", 1,1)]
-        int Mock(int x) { return x; }
+        [InterceptestMock(typeof(ServiceToMock),nameof(ServiceToMock.FunctionToMock), typeof(ControllerToTest), nameof(ControllerToTest.FunctionToTest))]
+        int Mock(int parameter) { return parameter; }
 
 
         //Act

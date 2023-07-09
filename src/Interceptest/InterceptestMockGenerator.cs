@@ -10,7 +10,7 @@ public class InterceptestMockGenerator : ISourceGenerator
         [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
         public sealed class InterceptestMockAttribute : Attribute
         {
-            public InterceptestMockAttribute(string filePath, int line, int character)
+            public InterceptestMockAttribute(System.Type typeToMock, string functionToMock, System.Type callingType, string callingFunction)
             {
             }
         }

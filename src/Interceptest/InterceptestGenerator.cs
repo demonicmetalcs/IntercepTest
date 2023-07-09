@@ -2,8 +2,12 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System;
 using System.Linq;
+using System.Diagnostics;
+using System.Collections.Immutable;
+using Interceptest.Helpers;
+using System.Reflection;
 
 namespace Interceptest;
 
@@ -28,7 +32,8 @@ public class InterceptestGenerator : ISourceGenerator
         }
         //context.AddSource("InterceptsLocation", Template());
 
-
+        var implementationTypeSetCache = new ImplementationTypeSetCache(context);
+        var alltest = implementationTypeSetCache.ForAssembly(context.Compilation.Assembly);
         var syntaxFactory = SyntaxFactory.CompilationUnit();
         syntaxFactory = syntaxFactory.AddUsings(SyntaxFactory.UsingDirective(SyntaxFactory.ParseName("System.Runtime.CompilerServices")), SyntaxFactory.UsingDirective(SyntaxFactory.ParseName("SampleProject")));
         var @namespace = SyntaxFactory.NamespaceDeclaration(SyntaxFactory.ParseName(_generateNamespace).NormalizeWhitespace());
@@ -39,25 +44,70 @@ public class InterceptestGenerator : ISourceGenerator
         foreach(var candidateMethod in receiver.CandidateMethods)
         {
             var attribute = candidateMethod.AttributeLists.Select(al => al.Attributes.First(a => ((IdentifierNameSyntax)a.Name).Identifier.ValueText == "InterceptestMockAttribute" || ((IdentifierNameSyntax)a.Name).Identifier.ValueText == "InterceptestMock")).First();
+            
+            var typeToMockExpression = (IdentifierNameSyntax)((TypeOfExpressionSyntax)attribute.ArgumentList.Arguments[0].Expression).Type;
+            var functionToMockExpression = (MemberAccessExpressionSyntax)((InvocationExpressionSyntax)attribute.ArgumentList.Arguments[1].Expression).ArgumentList.Arguments[0].Expression;
+            var typeToMock = alltest.First(t => t.Name == typeToMockExpression.Identifier.ValueText);
+            var memberToMock = typeToMock.GetMembers().OfType<IMethodSymbol>().FirstOrDefault(m => m.Name == ((IdentifierNameSyntax)functionToMockExpression.Name).Identifier.ValueText);
 
 
-            var methodDeclaration = SyntaxFactory.MethodDeclaration(SyntaxFactory.ParseTypeName("int"), "InterceptorMethod")
-            .AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword), SyntaxFactory.Token(SyntaxKind.StaticKeyword))
-            .WithParameterList(SyntaxFactory.ParameterList(SyntaxFactory.SeparatedList(
-                        new List<ParameterSyntax>{
+            var callingTypeExpression = (IdentifierNameSyntax)((TypeOfExpressionSyntax)attribute.ArgumentList.Arguments[2].Expression).Type;
+            var callingFunctionExpression = (MemberAccessExpressionSyntax)((InvocationExpressionSyntax)attribute.ArgumentList.Arguments[3].Expression).ArgumentList.Arguments[0].Expression;
+            var callingType = alltest.First(t => t.Name == callingTypeExpression.Identifier.ValueText);
+            var callingFunction = callingType.GetMembers().OfType<IMethodSymbol>().FirstOrDefault(m => m.Name == ((IdentifierNameSyntax)callingFunctionExpression.Name).Identifier.ValueText);
+            var begin = callingFunction.DeclaringSyntaxReferences[0].Span.Start;
+            var end = callingFunction.DeclaringSyntaxReferences[0].Span.End;
+            var method = callingFunction.DeclaringSyntaxReferences[0].SyntaxTree.ToString().Substring(begin, end - begin + 1);
+
+            var model = context.Compilation.GetSemanticModel(callingFunction.DeclaringSyntaxReferences[0].SyntaxTree);
+
+            var syntaxReference = callingFunction.DeclaringSyntaxReferences.FirstOrDefault().GetSyntax() as MethodDeclarationSyntax;
+            FileLinePositionSpan location = new FileLinePositionSpan();
+            foreach(var statement in syntaxReference.Body.Statements)
+            {
+                if(statement is ReturnStatementSyntax returnStatement)
+                {
+                    if(returnStatement.Expression is BinaryExpressionSyntax binaryExpressionSyntax)
+                    {
+                        if(binaryExpressionSyntax.Left is InvocationExpressionSyntax invocationExpressionSyntax)
+                        {
+                            if(invocationExpressionSyntax.Expression is MemberAccessExpressionSyntax memberAccessExpressionSyntax)
+                            {
+                                if(((IdentifierNameSyntax)memberAccessExpressionSyntax.Name).Identifier.ValueText == ((IdentifierNameSyntax)functionToMockExpression.Name).Identifier.ValueText)
+                                {
+                                    location = memberAccessExpressionSyntax.Name.GetLocation().GetLineSpan();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+
+
+            var testMethod = candidateMethod.Parent.Parent;
+            var testClass = candidateMethod.Parent.Parent.Parent as ClassDeclarationSyntax;
+
+            var parameters = new List<ParameterSyntax>{
                             SyntaxFactory.Parameter(SyntaxFactory.Identifier("p"))
                             .WithModifiers(SyntaxFactory.TokenList(SyntaxFactory.Token(SyntaxKind.ThisKeyword)))
-                            .WithType(SyntaxFactory.IdentifierName("ServiceToMock")),
-                            SyntaxFactory.Parameter(SyntaxFactory.Identifier("x"))
-                            .WithType(SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.IntKeyword)))})))
+                            .WithType(SyntaxFactory.ParseTypeName(typeToMock.ToDisplayString(new SymbolDisplayFormat(typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces))))};
+
+            parameters.AddRange(candidateMethod.ParameterList.Parameters);
+
+            
+
+            var methodDeclaration = SyntaxFactory.MethodDeclaration(SyntaxFactory.ParseTypeName("int"), "InterceptorMethod2")
+            .AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword), SyntaxFactory.Token(SyntaxKind.StaticKeyword)) 
+            .WithParameterList(SyntaxFactory.ParameterList(SyntaxFactory.SeparatedList(parameters)))
             .AddAttributeLists(SyntaxFactory.AttributeList(SyntaxFactory.SeparatedList(new List<AttributeSyntax>
             {
                 SyntaxFactory.Attribute(SyntaxFactory.ParseName("InterceptsLocation"),
                     SyntaxFactory.AttributeArgumentList(SyntaxFactory.SeparatedList(new List<AttributeArgumentSyntax>
                     {
-                        SyntaxFactory.AttributeArgument(SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression,SyntaxFactory.Literal("D:\\Github\\Interceptest\\src\\Sample\\SimpleSample\\SampleProject\\ControllerToTest.cs"))),
-                        SyntaxFactory.AttributeArgument(SyntaxFactory.LiteralExpression(SyntaxKind.NumericLiteralExpression,SyntaxFactory.Literal(15))),
-                        SyntaxFactory.AttributeArgument(SyntaxFactory.LiteralExpression(SyntaxKind.NumericLiteralExpression,SyntaxFactory.Literal(35)))
+                        SyntaxFactory.AttributeArgument(SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression,SyntaxFactory.Literal(callingFunction.DeclaringSyntaxReferences[0].SyntaxTree.FilePath))),
+                        SyntaxFactory.AttributeArgument(SyntaxFactory.LiteralExpression(SyntaxKind.NumericLiteralExpression,SyntaxFactory.Literal(location.StartLinePosition.Line + 1))),
+                        SyntaxFactory.AttributeArgument(SyntaxFactory.LiteralExpression(SyntaxKind.NumericLiteralExpression,SyntaxFactory.Literal(location.StartLinePosition.Character + 1)))
                     })))
             })));
 

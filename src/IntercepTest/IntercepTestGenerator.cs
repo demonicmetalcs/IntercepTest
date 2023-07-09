@@ -2,22 +2,16 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
-using System;
 using System.Linq;
-using System.Diagnostics;
-using System.Collections.Immutable;
 using IntercepTest.Helpers;
-using System.Reflection;
 
 namespace IntercepTest;
 
 [Generator]
 public class IntercepTestGenerator : ISourceGenerator
 {
-
-    private static readonly string _generateNamespace = "IntercepTest";
-    private static readonly string _generateClass = "IntercepTestGenerated";
-
+    private const string GenerateNamespace = "IntercepTest";
+    private const string GenerateClass = "IntercepTestGenerated";
 
 
     public void Initialize(GeneratorInitializationContext context)
@@ -26,18 +20,15 @@ public class IntercepTestGenerator : ISourceGenerator
     }
     public void Execute(GeneratorExecutionContext context)
     {
-        if (!(context.SyntaxReceiver is IntercepTestMockAttributeSyntaxReceiver receiver))
-        {
+        if (context.SyntaxReceiver is not IntercepTestMockAttributeSyntaxReceiver receiver)
             return;
-        }
-        //context.AddSource("InterceptsLocation", Template());
-
+        
         var implementationTypeSetCache = new ImplementationTypeSetCache(context);
-        var alltest = implementationTypeSetCache.ForAssembly(context.Compilation.Assembly);
+        var namedSymbolsForAssemly = implementationTypeSetCache.ForAssembly(context.Compilation.Assembly);
         var syntaxFactory = SyntaxFactory.CompilationUnit();
         syntaxFactory = syntaxFactory.AddUsings(SyntaxFactory.UsingDirective(SyntaxFactory.ParseName("System.Runtime.CompilerServices")));
-        var @namespace = SyntaxFactory.NamespaceDeclaration(SyntaxFactory.ParseName(_generateNamespace).NormalizeWhitespace());
-        var classDeclaration = SyntaxFactory.ClassDeclaration(_generateClass)
+        var @namespace = SyntaxFactory.NamespaceDeclaration(SyntaxFactory.ParseName(GenerateNamespace).NormalizeWhitespace());
+        var classDeclaration = SyntaxFactory.ClassDeclaration(GenerateClass)
             .AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword), SyntaxFactory.Token(SyntaxKind.StaticKeyword));
 
         var generatedMethods = new Dictionary<string,MethodDeclarationSyntax>();
@@ -50,22 +41,14 @@ public class IntercepTestGenerator : ISourceGenerator
             //todo clean up
             var typeToMockExpression = (IdentifierNameSyntax)((TypeOfExpressionSyntax)attribute.ArgumentList.Arguments[0].Expression).Type;
             var functionToMockExpression = (MemberAccessExpressionSyntax)((InvocationExpressionSyntax)attribute.ArgumentList.Arguments[1].Expression).ArgumentList.Arguments[0].Expression;
-            var typeToMock = alltest.First(t => t.Name == typeToMockExpression.Identifier.ValueText);
-            var memberToMock = typeToMock.GetMembers().OfType<IMethodSymbol>().FirstOrDefault(m => m.Name == ((IdentifierNameSyntax)functionToMockExpression.Name).Identifier.ValueText);
-
+            var typeToMock = namedSymbolsForAssemly.First(t => t.Name == typeToMockExpression.Identifier.ValueText);
+            
 
             var callingTypeExpression = (IdentifierNameSyntax)((TypeOfExpressionSyntax)attribute.ArgumentList.Arguments[2].Expression).Type;
             var callingFunctionExpression = (MemberAccessExpressionSyntax)((InvocationExpressionSyntax)attribute.ArgumentList.Arguments[3].Expression).ArgumentList.Arguments[0].Expression;
-            var callingType = alltest.First(t => t.Name == callingTypeExpression.Identifier.ValueText);
+            var callingType = namedSymbolsForAssemly.First(t => t.Name == callingTypeExpression.Identifier.ValueText);
             var callingFunction = callingType.GetMembers().OfType<IMethodSymbol>().FirstOrDefault(m => m.Name == ((IdentifierNameSyntax)callingFunctionExpression.Name).Identifier.ValueText);
-            var begin = callingFunction.DeclaringSyntaxReferences[0].Span.Start;
-            var end = callingFunction.DeclaringSyntaxReferences[0].Span.End;
-            var method = callingFunction.DeclaringSyntaxReferences[0].SyntaxTree.ToString().Substring(begin, end - begin + 1);
-
-            var model = context.Compilation.GetSemanticModel(callingFunction.DeclaringSyntaxReferences[0].SyntaxTree);
-
-            var syntaxReference = callingFunction.DeclaringSyntaxReferences.FirstOrDefault().GetSyntax() as MethodDeclarationSyntax;
-
+            
             var location = receiver.MemberAccessExpressions[new MethodAccessExpressionKey(callingTypeExpression.Identifier.ValueText, ((IdentifierNameSyntax)callingFunctionExpression.Name).Identifier.ValueText, typeToMockExpression.Identifier.ValueText, ((IdentifierNameSyntax)functionToMockExpression.Name).Identifier.ValueText)].GetLineSpan();
 
 
@@ -166,8 +149,8 @@ public class IntercepTestGenerator : ISourceGenerator
         {
             if(methodDeclaration.Value.ReturnType != SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.VoidKeyword)))
             {
-                var complatedMethode = methodDeclaration.Value.AddBodyStatements(SyntaxFactory.ReturnStatement(SyntaxFactory.DefaultExpression(methodDeclaration.Value.ReturnType)));
-                classDeclaration = classDeclaration.AddMembers(complatedMethode);
+                var completedMethod = methodDeclaration.Value.AddBodyStatements(SyntaxFactory.ReturnStatement(SyntaxFactory.DefaultExpression(methodDeclaration.Value.ReturnType)));
+                classDeclaration = classDeclaration.AddMembers(completedMethod);
             }
         }
 
@@ -177,7 +160,7 @@ public class IntercepTestGenerator : ISourceGenerator
 
     }
 
-    private static IfStatementSyntax IfStatementSyntax(string testClassName,        string testMethodName, LocalFunctionStatementSyntax candidateMethod)
+    private static IfStatementSyntax IfStatementSyntax(string testClassName,string testMethodName, LocalFunctionStatementSyntax candidateMethod)
     {
         var ifSyntax = SyntaxFactory.IfStatement(
                 SyntaxFactory.BinaryExpression(

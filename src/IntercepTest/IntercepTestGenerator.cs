@@ -12,7 +12,7 @@ using System.Reflection;
 namespace IntercepTest;
 
 [Generator]
-public class IntercepestGenerator : ISourceGenerator
+public class IntercepTestGenerator : ISourceGenerator
 {
 
     private static readonly string _generateNamespace = "IntercepTest";

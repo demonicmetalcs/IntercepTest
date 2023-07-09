@@ -24,7 +24,7 @@ public class IntercepTestGenerator : ISourceGenerator
             return;
         
         var implementationTypeSetCache = new ImplementationTypeSetCache(context);
-        var namedSymbolsForAssemly = implementationTypeSetCache.ForAssembly(context.Compilation.Assembly);
+        var namedSymbolsForAssembly = implementationTypeSetCache.ForAssembly(context.Compilation.Assembly);
         var syntaxFactory = SyntaxFactory.CompilationUnit();
         syntaxFactory = syntaxFactory.AddUsings(SyntaxFactory.UsingDirective(SyntaxFactory.ParseName("System.Runtime.CompilerServices")));
         var @namespace = SyntaxFactory.NamespaceDeclaration(SyntaxFactory.ParseName(GenerateNamespace).NormalizeWhitespace());
@@ -41,12 +41,12 @@ public class IntercepTestGenerator : ISourceGenerator
             //todo clean up
             var typeToMockExpression = (IdentifierNameSyntax)((TypeOfExpressionSyntax)attribute.ArgumentList.Arguments[0].Expression).Type;
             var functionToMockExpression = (MemberAccessExpressionSyntax)((InvocationExpressionSyntax)attribute.ArgumentList.Arguments[1].Expression).ArgumentList.Arguments[0].Expression;
-            var typeToMock = namedSymbolsForAssemly.First(t => t.Name == typeToMockExpression.Identifier.ValueText);
+            var typeToMock = namedSymbolsForAssembly.First(t => t.Name == typeToMockExpression.Identifier.ValueText);
             
 
             var callingTypeExpression = (IdentifierNameSyntax)((TypeOfExpressionSyntax)attribute.ArgumentList.Arguments[2].Expression).Type;
             var callingFunctionExpression = (MemberAccessExpressionSyntax)((InvocationExpressionSyntax)attribute.ArgumentList.Arguments[3].Expression).ArgumentList.Arguments[0].Expression;
-            var callingType = namedSymbolsForAssemly.First(t => t.Name == callingTypeExpression.Identifier.ValueText);
+            var callingType = namedSymbolsForAssembly.First(t => t.Name == callingTypeExpression.Identifier.ValueText);
             var callingFunction = callingType.GetMembers().OfType<IMethodSymbol>().FirstOrDefault(m => m.Name == ((IdentifierNameSyntax)callingFunctionExpression.Name).Identifier.ValueText);
             
             var location = receiver.MemberAccessExpressions[new MethodAccessExpressionKey(callingTypeExpression.Identifier.ValueText, ((IdentifierNameSyntax)callingFunctionExpression.Name).Identifier.ValueText, typeToMockExpression.Identifier.ValueText, ((IdentifierNameSyntax)functionToMockExpression.Name).Identifier.ValueText)].GetLineSpan();

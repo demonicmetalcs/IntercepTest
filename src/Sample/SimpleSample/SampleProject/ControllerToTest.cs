@@ -15,7 +15,7 @@
             return _serviceToMock.FunctionToMock(parse)*5;
         }
 
-        public int FunctionToTest2(string parameter)
+        public int FunctionToTestMultiple2(string parameter)
         {
             int parse = int.Parse(parameter);
             return _serviceToMock.FunctionToMockMultiple2(parse) * _serviceToMock.FunctionToMockMultiple3(parse);

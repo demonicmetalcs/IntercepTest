@@ -30,15 +30,15 @@ public class UnitTest1
         //Arrange
         var sut = new ControllerToTest(null);
 
-        [InterceptestMock(typeof(ServiceToMock), nameof(ServiceToMock.FunctionToMockMultiple2), typeof(ControllerToTest), nameof(ControllerToTest.FunctionToTest2))]
+        [InterceptestMock(typeof(ServiceToMock), nameof(ServiceToMock.FunctionToMockMultiple2), typeof(ControllerToTest), nameof(ControllerToTest.FunctionToTestMultiple2))]
         int Mock2(int parameter) { return parameter; }
 
-        [InterceptestMock(typeof(ServiceToMock), nameof(ServiceToMock.FunctionToMockMultiple3), typeof(ControllerToTest), nameof(ControllerToTest.FunctionToTest2))]
+        [InterceptestMock(typeof(ServiceToMock), nameof(ServiceToMock.FunctionToMockMultiple3), typeof(ControllerToTest), nameof(ControllerToTest.FunctionToTestMultiple2))]
         int Mock3(int parameter) { return parameter +5; }
 
 
         //Act
-        var result = sut.FunctionToTest2("5");
+        var result = sut.FunctionToTestMultiple2("5");
 
         //Assert
         Assert.AreEqual(50, result);

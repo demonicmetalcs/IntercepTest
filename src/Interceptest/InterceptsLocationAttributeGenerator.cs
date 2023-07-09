@@ -19,7 +19,7 @@ public class InterceptsLocationAttributeGenerator : ISourceGenerator
 
     public void Execute(GeneratorExecutionContext context)
     {
-        context.AddSource("Interceptest", s_attributesSource);
+        context.AddSource("InterceptestInterceptsLocationAttribute", s_attributesSource);
     }
 
     public void Initialize(GeneratorInitializationContext context)

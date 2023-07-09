@@ -5,7 +5,7 @@ using System;
 using System.Linq;
 using System.Diagnostics;
 
-namespace Interceptest;
+namespace IntercepTest;
 
 public record MethodAccessExpressionKey
 {
@@ -23,7 +23,7 @@ public record MethodAccessExpressionKey
     public string MethodName { get; }
 }
 
-public class InterceptestMockAttributeSyntaxReceiver : ISyntaxReceiver
+public class IntercepTestMockAttributeSyntaxReceiver : ISyntaxReceiver
 {
     public List<LocalFunctionStatementSyntax> CandidateMethods { get; } = new List<LocalFunctionStatementSyntax>();
     public Dictionary<MethodAccessExpressionKey, Location> MemberAccessExpressions { get; } = new Dictionary<MethodAccessExpressionKey, Location>();
@@ -37,7 +37,7 @@ public class InterceptestMockAttributeSyntaxReceiver : ISyntaxReceiver
         // any method with at least one attribute is a candidate for property generation
         if (syntaxNode is LocalFunctionStatementSyntax localFunctionStatementSyntax)            
         {
-            if (localFunctionStatementSyntax.AttributeLists.Select(al => al.Attributes.FirstOrDefault(a => ((IdentifierNameSyntax)a.Name).Identifier.ValueText == "InterceptestMockAttribute" || ((IdentifierNameSyntax)a.Name).Identifier.ValueText == "InterceptestMock")).FirstOrDefault() != null)
+            if (localFunctionStatementSyntax.AttributeLists.Select(al => al.Attributes.FirstOrDefault(a => ((IdentifierNameSyntax)a.Name).Identifier.ValueText == "IntercepTestMockAttribute" || ((IdentifierNameSyntax)a.Name).Identifier.ValueText == "IntercepTestMock")).FirstOrDefault() != null)
                 CandidateMethods.Add(localFunctionStatementSyntax);
         }
         if (syntaxNode is MemberAccessExpressionSyntax memberAccessExpressionSyntax)

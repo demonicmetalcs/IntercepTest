@@ -1,6 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 
-namespace Interceptest;
+namespace IntercepTest;
 
 [Generator]
 public class InterceptsLocationAttributeGenerator : ISourceGenerator
@@ -19,7 +19,7 @@ public class InterceptsLocationAttributeGenerator : ISourceGenerator
 
     public void Execute(GeneratorExecutionContext context)
     {
-        context.AddSource("InterceptestInterceptsLocationAttribute", s_attributesSource);
+        context.AddSource("IntercepTestInterceptsLocationAttribute", s_attributesSource);
     }
 
     public void Initialize(GeneratorInitializationContext context)

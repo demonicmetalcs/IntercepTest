@@ -1,16 +1,16 @@
 ﻿using Microsoft.CodeAnalysis;
 
-namespace Interceptest;
+namespace IntercepTest;
 
 [Generator]
-public class InterceptestMockGenerator : ISourceGenerator
+public class IntercepTestMockGenerator : ISourceGenerator
 {
-    private static readonly string s_attributesSource = (@"namespace Interceptest;
+    private static readonly string s_attributesSource = (@"namespace IntercepTest;
 
         [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
-        public sealed class InterceptestMockAttribute : Attribute
+        public sealed class IntercepTestMockAttribute : Attribute
         {
-            public InterceptestMockAttribute(System.Type typeToMock, string functionToMock, System.Type callingType, string callingFunction)
+            public IntercepTestMockAttribute(System.Type typeToMock, string functionToMock, System.Type callingType, string callingFunction)
             {
             }
         }
@@ -20,6 +20,6 @@ public class InterceptestMockGenerator : ISourceGenerator
 
     public void Execute(GeneratorExecutionContext context)
     {
-        context.AddSource("InterceptestMockAttribute", s_attributesSource);
+        context.AddSource("IntercepTestMockAttribute", s_attributesSource);
     }    
 }

@@ -6,27 +6,27 @@ using System;
 using System.Linq;
 using System.Diagnostics;
 using System.Collections.Immutable;
-using Interceptest.Helpers;
+using IntercepTest.Helpers;
 using System.Reflection;
 
-namespace Interceptest;
+namespace IntercepTest;
 
 [Generator]
-public class InterceptestGenerator : ISourceGenerator
+public class IntercepestGenerator : ISourceGenerator
 {
 
-    private static readonly string _generateNamespace = "Interceptest";
-    private static readonly string _generateClass = "InterceptestGenerated";
+    private static readonly string _generateNamespace = "IntercepTest";
+    private static readonly string _generateClass = "IntercepTestGenerated";
 
 
 
     public void Initialize(GeneratorInitializationContext context)
     {
-        context.RegisterForSyntaxNotifications(() => new InterceptestMockAttributeSyntaxReceiver());
+        context.RegisterForSyntaxNotifications(() => new IntercepTestMockAttributeSyntaxReceiver());
     }
     public void Execute(GeneratorExecutionContext context)
     {
-        if (!(context.SyntaxReceiver is InterceptestMockAttributeSyntaxReceiver receiver))
+        if (!(context.SyntaxReceiver is IntercepTestMockAttributeSyntaxReceiver receiver))
         {
             return;
         }
@@ -43,7 +43,7 @@ public class InterceptestGenerator : ISourceGenerator
         var generatedMethods = new Dictionary<string,MethodDeclarationSyntax>();
         foreach (var candidateMethod in receiver.CandidateMethods)
         {
-            var attribute = candidateMethod.AttributeLists.Select(al => al.Attributes.First(a => ((IdentifierNameSyntax)a.Name).Identifier.ValueText == "InterceptestMockAttribute" || ((IdentifierNameSyntax)a.Name).Identifier.ValueText == "InterceptestMock")).First();
+            var attribute = candidateMethod.AttributeLists.Select(al => al.Attributes.First(a => ((IdentifierNameSyntax)a.Name).Identifier.ValueText == "IntercepTestMockAttribute" || ((IdentifierNameSyntax)a.Name).Identifier.ValueText == "IntercepTestMock")).First();
 
             
 
@@ -173,7 +173,7 @@ public class InterceptestGenerator : ISourceGenerator
 
         @namespace = @namespace.AddMembers(classDeclaration);
         syntaxFactory = syntaxFactory.AddMembers(@namespace);
-        context.AddSource("Interceptest", syntaxFactory.NormalizeWhitespace().ToFullString());
+        context.AddSource("IntercepTest", syntaxFactory.NormalizeWhitespace().ToFullString());
 
     }
 

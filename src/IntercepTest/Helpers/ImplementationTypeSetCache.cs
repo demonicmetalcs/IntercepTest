@@ -4,7 +4,7 @@ using System.Collections.Immutable;
 using System;
 using System.Linq;
 
-namespace Interceptest.Helpers;
+namespace IntercepTest.Helpers;
 
 internal interface IImplementationTypeSetCache
 {

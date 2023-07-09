@@ -20,5 +20,11 @@
             int parse = int.Parse(parameter);
             return _serviceToMock.FunctionToMockMultiple2(parse) * _serviceToMock.FunctionToMockMultiple3(parse);
         }
+
+        public int MultipleInjectionSameFunctionTest(string parameter)
+        {
+            int parse = int.Parse(parameter);
+            return _serviceToMock.FunctionToMockMultipleInjection(parse);
+        }
     }
 }

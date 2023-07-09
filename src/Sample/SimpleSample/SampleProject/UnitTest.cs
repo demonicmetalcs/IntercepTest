@@ -1,6 +1,8 @@
 ﻿//todo this should be in a different assembly
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Interceptest;
+using System.Diagnostics;
+using System.Linq;
 
 namespace SampleProject;
 
@@ -42,6 +44,40 @@ public class UnitTest1
 
         //Assert
         Assert.AreEqual(50, result);
+    }
+
+
+    [TestMethod]
+    public void MultipleInjectionSameFunctionTest1()
+    {
+        //Arrange
+        var sut = new ControllerToTest(null);
+
+        [InterceptestMock(typeof(ServiceToMock), nameof(ServiceToMock.FunctionToMockMultipleInjection), typeof(ControllerToTest), nameof(ControllerToTest.MultipleInjectionSameFunctionTest))]
+        int Mock4(int parameter){ return parameter; }   
+
+        //Act
+        var result = sut.MultipleInjectionSameFunctionTest("5");
+
+        //Assert
+        Assert.AreEqual(5, result);
+    }
+
+    [TestMethod]
+    public void MultipleInjectionSameFunctionTest2()
+    {
+        //Arrange
+        var sut = new ControllerToTest(null);
+
+        [InterceptestMock(typeof(ServiceToMock), nameof(ServiceToMock.FunctionToMockMultipleInjection), typeof(ControllerToTest), nameof(ControllerToTest.MultipleInjectionSameFunctionTest))]
+        int Mock5(int parameter){ return parameter * 10; }
+
+        //Act
+        var result = sut.MultipleInjectionSameFunctionTest("5");
+
+        //Assert
+        Assert.AreEqual(50, result);
+                
     }
 }
 

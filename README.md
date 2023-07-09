@@ -23,4 +23,4 @@ This project will try to use [Interceptors](https://learn.microsoft.com/en-us/do
 - [X] can InterceptsLocationAttribute be used with source generation
 - [X] Find method to mock
 - [ ] Test/mock code and generated code in different projects
-- [ ] multiple injected code for one function for different test
+- [X] multiple injected code for one function for different test

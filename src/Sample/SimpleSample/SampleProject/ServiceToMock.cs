@@ -15,5 +15,10 @@
         {
             throw new NotImplementedException();
         }
+
+        public int FunctionToMockMultipleInjection(int parameter)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

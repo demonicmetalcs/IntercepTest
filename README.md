@@ -15,5 +15,11 @@ So it might me difficult to test a function or impossable to mock a function.
 
 This project will try to use [Interceptors](https://learn.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-12#interceptors) to mock functions that is difficult to mock.
 
+
 ## Purpose
 
+## Initial Problems
+
+- [X] can InterceptsLocationAttribute be used with source generation
+- [ ] Test/mock code and generated code in different projects
+- [ ] multiple injected code for one function for different test

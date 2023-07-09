@@ -79,7 +79,7 @@ public class InterceptestGenerator : ISourceGenerator
 
 
 
-            var methodDeclaration = SyntaxFactory.MethodDeclaration(SyntaxFactory.ParseTypeName("int"),candidateMethod.Identifier.ValueText )
+            var methodDeclaration = SyntaxFactory.MethodDeclaration(candidateMethod.ReturnType,candidateMethod.Identifier.ValueText )
             .AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword), SyntaxFactory.Token(SyntaxKind.StaticKeyword))
             .WithParameterList(SyntaxFactory.ParameterList(SyntaxFactory.SeparatedList(parameters)))
             .AddAttributeLists(SyntaxFactory.AttributeList(SyntaxFactory.SeparatedList(new List<AttributeSyntax>

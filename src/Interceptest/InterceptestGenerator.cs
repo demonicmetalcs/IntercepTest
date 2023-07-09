@@ -35,7 +35,7 @@ public class InterceptestGenerator : ISourceGenerator
         var implementationTypeSetCache = new ImplementationTypeSetCache(context);
         var alltest = implementationTypeSetCache.ForAssembly(context.Compilation.Assembly);
         var syntaxFactory = SyntaxFactory.CompilationUnit();
-        syntaxFactory = syntaxFactory.AddUsings(SyntaxFactory.UsingDirective(SyntaxFactory.ParseName("System.Runtime.CompilerServices")), SyntaxFactory.UsingDirective(SyntaxFactory.ParseName("SampleProject")));
+        syntaxFactory = syntaxFactory.AddUsings(SyntaxFactory.UsingDirective(SyntaxFactory.ParseName("System.Runtime.CompilerServices")));
         var @namespace = SyntaxFactory.NamespaceDeclaration(SyntaxFactory.ParseName(_generateNamespace).NormalizeWhitespace());
         var classDeclaration = SyntaxFactory.ClassDeclaration(_generateClass)
             .AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword),SyntaxFactory.Token(SyntaxKind.StaticKeyword));

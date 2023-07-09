@@ -63,30 +63,9 @@ public class InterceptestGenerator : ISourceGenerator
             var model = context.Compilation.GetSemanticModel(callingFunction.DeclaringSyntaxReferences[0].SyntaxTree);
 
             var syntaxReference = callingFunction.DeclaringSyntaxReferences.FirstOrDefault().GetSyntax() as MethodDeclarationSyntax;
-            FileLinePositionSpan location = new FileLinePositionSpan();
 
-            //todo syntax walker
-            foreach(var statement in syntaxReference.Body.Statements)
-            {
-                if(statement is ReturnStatementSyntax returnStatement)
-                {
-                    if(returnStatement.Expression is BinaryExpressionSyntax binaryExpressionSyntax)
-                    {
-                        if(binaryExpressionSyntax.Left is InvocationExpressionSyntax invocationExpressionSyntax)
-                        {
-                            if(invocationExpressionSyntax.Expression is MemberAccessExpressionSyntax memberAccessExpressionSyntax)
-                            {
-                                if(((IdentifierNameSyntax)memberAccessExpressionSyntax.Name).Identifier.ValueText == ((IdentifierNameSyntax)functionToMockExpression.Name).Identifier.ValueText)
-                                {
-                                    location = memberAccessExpressionSyntax.Name.GetLocation().GetLineSpan();
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-
+            var location = receiver.MemberAccessExpressions[new MethodAccessExpressionKey(callingTypeExpression.Identifier.ValueText, ((IdentifierNameSyntax)callingFunctionExpression.Name).Identifier.ValueText, typeToMockExpression.Identifier.ValueText, ((IdentifierNameSyntax)functionToMockExpression.Name).Identifier.ValueText)].GetLineSpan();
+                     
 
             var testMethod = candidateMethod.Parent.Parent;
             var testClass = candidateMethod.Parent.Parent.Parent as ClassDeclarationSyntax;
@@ -125,11 +104,6 @@ public class InterceptestGenerator : ISourceGenerator
 
 
         
-    }
-
-    private string GetInterceptorFilePath(SyntaxTree tree, Compilation compilation)
-    {
-        return compilation.Options.SourceReferenceResolver?.NormalizePath(tree.FilePath, baseFilePath: null) ?? tree.FilePath;
     }
 }
 

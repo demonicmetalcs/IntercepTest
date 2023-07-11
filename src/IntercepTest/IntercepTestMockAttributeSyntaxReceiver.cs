@@ -64,7 +64,7 @@ public class IntercepTestMockAttributeSyntaxReceiver : ISyntaxReceiver
             MemberAccessExpressions.Add(new MethodAccessExpressionKey(containingClass.Identifier.ValueText, containingMethod.Identifier.ValueText, ((IdentifierNameSyntax)classToCallType).Identifier.ValueText, methodName), memberAccessExpressionSyntax.Name.GetLocation());
         }
 
-        if (syntaxNode is AttributeSyntax attributeSyntax && ((IdentifierNameSyntax)attributeSyntax.Name).Identifier.ValueText is "IntercepTestProjectAttribute" or "IntercepTestProject")
+        if (syntaxNode is AttributeSyntax attributeSyntax && attributeSyntax.Name is IdentifierNameSyntax syntax  && syntax.Identifier.ValueText is "IntercepTestProjectAttribute" or "IntercepTestProject")
         {
             Project project = null;
             MSBuildWorkspace workspace = null;

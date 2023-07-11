@@ -41,10 +41,10 @@ public class IntercepTestGenerator : ISourceGenerator
         {
             GenerateFunction(candidateMethod, namedSymbolsForAssembly, receiver, generatedMethods);
         }
-        foreach (var candidateMethod in receiver.CandidateMethodsOtherProject)
-        {
-            GenerateFunction(candidateMethod, namedSymbolsForAssembly, receiver, generatedMethods);
-        }
+        //foreach (var candidateMethod in receiver.CandidateMethodsOtherProject)
+        //{
+        //    GenerateFunction(candidateMethod, namedSymbolsForAssembly, receiver, generatedMethods);
+        //}
 
         foreach (var methodDeclaration in generatedMethods)
         {

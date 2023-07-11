@@ -24,6 +24,7 @@
         public int MultipleInjectionSameFunctionTest(string parameter)
         {
             int parse = int.Parse(parameter);
+
             return _serviceToMock.FunctionToMockMultipleInjection(parse);
         }
     }

@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleProject", "src\Sample
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleTestProject", "src\Sample\SimpleSample\SampleTestProject\SampleTestProject.csproj", "{988C9A25-EBAB-4A16-9141-6AE2892A0428}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntercepTest", "src\Interceptest\IntercepTest.csproj", "{D0C9DB32-8566-47F0-B603-EDD1881CA22A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntercepTest", "src\Interceptest\IntercepTest.csproj", "{D0C9DB32-8566-47F0-B603-EDD1881CA22A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

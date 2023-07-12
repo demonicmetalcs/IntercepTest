@@ -22,7 +22,7 @@ public class IntercepTestGenerator : ISourceGenerator
     {
         if (context.SyntaxReceiver is not IntercepTestMockAttributeSyntaxReceiver receiver)
             return;
-        
+
         var implementationTypeSetCache = new ImplementationTypeSetCache(context);
         var namedSymbolsForAssembly = implementationTypeSetCache.ForAssembly(context.Compilation.Assembly);
         var syntaxFactory = SyntaxFactory.CompilationUnit();
@@ -43,7 +43,6 @@ public class IntercepTestGenerator : ISourceGenerator
             var functionToMockExpression = (MemberAccessExpressionSyntax)((InvocationExpressionSyntax)attribute.ArgumentList.Arguments[1].Expression).ArgumentList.Arguments[0].Expression;
             var typeToMock = namedSymbolsForAssembly.First(t => t.Name == typeToMockExpression.Identifier.ValueText);
             
-
             var callingTypeExpression = (IdentifierNameSyntax)((TypeOfExpressionSyntax)attribute.ArgumentList.Arguments[2].Expression).Type;
             var callingFunctionExpression = (MemberAccessExpressionSyntax)((InvocationExpressionSyntax)attribute.ArgumentList.Arguments[3].Expression).ArgumentList.Arguments[0].Expression;
             var callingType = namedSymbolsForAssembly.First(t => t.Name == callingTypeExpression.Identifier.ValueText);
@@ -97,46 +96,7 @@ public class IntercepTestGenerator : ISourceGenerator
                         SyntaxFactory.AttributeArgument(SyntaxFactory.LiteralExpression(SyntaxKind.NumericLiteralExpression,SyntaxFactory.Literal(location.StartLinePosition.Character + 1)))
                     })))
             })));
-                var callingFrameSyntax =
-                    SyntaxFactory.LocalDeclarationStatement(
-                        SyntaxFactory.VariableDeclaration(
-                            SyntaxFactory.IdentifierName(
-                                SyntaxFactory.Identifier(
-                                    SyntaxFactory.TriviaList(),
-                                    SyntaxKind.VarKeyword,
-                                    "var",
-                                    "var",
-                                    SyntaxFactory.TriviaList())))
-                        .WithVariables(
-                            SyntaxFactory.SingletonSeparatedList(
-                                SyntaxFactory.VariableDeclarator(
-                                    SyntaxFactory.Identifier("callingMethod"))
-                                .WithInitializer(
-                                    SyntaxFactory.EqualsValueClause(
-                                        SyntaxFactory.InvocationExpression(
-                                            SyntaxFactory.MemberAccessExpression(
-                                                SyntaxKind.SimpleMemberAccessExpression,
-                                                SyntaxFactory.InvocationExpression(
-                                                    SyntaxFactory.MemberAccessExpression(
-                                                        SyntaxKind.SimpleMemberAccessExpression,
-                                                        SyntaxFactory.ObjectCreationExpression(
-                                                            SyntaxFactory.QualifiedName(
-                                                                SyntaxFactory.QualifiedName(
-                                                                    SyntaxFactory.IdentifierName("System"),
-                                                                    SyntaxFactory.IdentifierName("Diagnostics")),
-                                                                SyntaxFactory.IdentifierName("StackTrace")))
-                                                        .WithArgumentList(
-                                                            SyntaxFactory.ArgumentList()),
-                                                        SyntaxFactory.IdentifierName("GetFrame")))
-                                                .WithArgumentList(
-                                                    SyntaxFactory.ArgumentList(
-                                                        SyntaxFactory.SingletonSeparatedList(
-                                                            SyntaxFactory.Argument(
-                                                                SyntaxFactory.LiteralExpression(
-                                                                    SyntaxKind.NumericLiteralExpression,
-                                                                    SyntaxFactory.Literal(1)))))),
-                                                SyntaxFactory.IdentifierName("GetMethod"))))))));
-                methodDeclaration = methodDeclaration.AddBodyStatements(callingFrameSyntax);
+                
                 var ifSyntax = IfStatementSyntax(testClass.Identifier.ValueText, testMethod.Identifier.ValueText, candidateMethod);
                 methodDeclaration = methodDeclaration.AddBodyStatements(ifSyntax);
                 generatedMethods.Add(generatedMethodName, methodDeclaration);

@@ -1,4 +1,8 @@
-﻿namespace SampleProject
+﻿using System.Runtime.CompilerServices;
+
+[assembly: IntercepTestProject("D:\\Github\\Interceptest\\src\\Sample\\SimpleSample\\SampleTestProject\\SampleTestProject.csproj")]
+
+namespace SampleProject
 {
     public class ServiceToMock
     {

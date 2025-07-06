@@ -34,7 +34,7 @@ public class IntercepTestMockAttributeSyntaxReceiver : ISyntaxReceiver
     public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
     {
 
-        // any method with at least one attribute is a candidate for property generation
+        // any local function with at least one attribute is a candidate for method generation
         if (syntaxNode is LocalFunctionStatementSyntax localFunctionStatementSyntax)            
         {
             if (localFunctionStatementSyntax.AttributeLists.Select(al => al.Attributes.FirstOrDefault(a => ((IdentifierNameSyntax)a.Name).Identifier.ValueText == "IntercepTestMockAttribute" || ((IdentifierNameSyntax)a.Name).Identifier.ValueText == "IntercepTestMock")).FirstOrDefault() != null)
